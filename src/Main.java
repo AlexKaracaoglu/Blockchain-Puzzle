@@ -37,10 +37,12 @@ public class Main {
 
     private static final String UTF8 = "utf8";
     private static final String SHA_256 = "SHA-256";
+    private static final Integer SIXTY_FOUR = 64;
 
     public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
         String difficulty = "0000004011111111111111111111111111111111111111111111111111111111";
+        checkValidDifficultyLength(difficulty);
 
         long startTime = System.currentTimeMillis();
         long endTime = System.currentTimeMillis();
@@ -69,6 +71,12 @@ public class Main {
             }
         }
         System.out.println("Time to find a valid hash: " + getTimeElapsedInSeconds(startTime, endTime) + " seconds");
+    }
+
+    private static void checkValidDifficultyLength(String difficulty) {
+        if (difficulty.length() != SIXTY_FOUR) {
+            throw new IllegalArgumentException("Difficulty hex string must be of length 64");
+        }
     }
 
     private static Double getTimeElapsedInSeconds(long startTime, long endTime) {
