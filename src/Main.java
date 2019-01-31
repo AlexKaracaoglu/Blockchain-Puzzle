@@ -27,12 +27,16 @@
  *      3. How can we make the while loop better?
  */
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 public class Main {
+
+    private static final String UTF8 = "utf8";
+    private static final String SHA_256 = "SHA-256";
 
     public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
@@ -41,8 +45,8 @@ public class Main {
 
         int numberOfNoncesChecked = 0;
 
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-        BlockchainHeader header = new BlockchainHeader("0011111111111111111111111111111111111111111111111111111111111111");
+        MessageDigest messageDigest = MessageDigest.getInstance(SHA_256);
+        BlockchainHeader header = new BlockchainHeader("0000004011111111111111111111111111111111111111111111111111111111");
         Random rand = new Random();
 
         while (Boolean.TRUE) {
@@ -56,13 +60,17 @@ public class Main {
                 header.setValidNonce(nonce);
                 header.setUnixTime(System.currentTimeMillis() / 1000L);
 
-                System.out.println("Nonce is: " + nonce + ", Nonces checked: " + numberOfNoncesChecked);
+                System.out.println("Valid nonce is: " + nonce + ", Number of nonces checked: " + numberOfNoncesChecked);
                 System.out.println("Hash Value is: " + hashValue);
 
                 break;
             }
         }
-        System.out.println("Time to find a valid hash: " + (endTime - startTime) + " miliseconds");
+        System.out.println("Time to find a valid hash: " + getTimeElapsedInSeconds(startTime, endTime) + " seconds");
+    }
+
+    private static Double getTimeElapsedInSeconds(long startTime, long endTime) {
+        return (endTime - startTime) / 1000.;
     }
 
     private static String getNonce(Random rand) {
@@ -70,8 +78,8 @@ public class Main {
     }
 
     private static String getHashValue(String hashOfPreviousBlock, String nonce, MessageDigest messageDigest) throws UnsupportedEncodingException {
-        messageDigest.update((hashOfPreviousBlock + nonce).getBytes("utf8"));
+        messageDigest.update((hashOfPreviousBlock + nonce).getBytes(UTF8));
         byte[] digestBytes = messageDigest.digest();
-        return javax.xml.bind.DatatypeConverter.printHexBinary(digestBytes).toLowerCase();
+        return DatatypeConverter.printHexBinary(digestBytes).toLowerCase();
     }
 }
