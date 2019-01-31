@@ -40,19 +40,21 @@ public class Main {
 
     public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
+        String difficulty = "0000004011111111111111111111111111111111111111111111111111111111";
+
         long startTime = System.currentTimeMillis();
         long endTime = System.currentTimeMillis();
 
         int numberOfNoncesChecked = 0;
 
         MessageDigest messageDigest = MessageDigest.getInstance(SHA_256);
-        BlockchainHeader header = new BlockchainHeader("0000004011111111111111111111111111111111111111111111111111111111");
-        Random rand = new Random();
+        Random random = new Random();
+        BlockchainHeader header = new BlockchainHeader(difficulty, random);
 
         while (Boolean.TRUE) {
             numberOfNoncesChecked++;
 
-            String nonce = getNonce(rand);
+            String nonce = getNonce(random);
             String hashValue = getHashValue(header.getHashOfPreviousBlock(), nonce, messageDigest);
 
             if (hashValue.compareTo(header.getDifficulty()) < 0) {

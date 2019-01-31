@@ -18,10 +18,9 @@ public class BlockchainHeader {
 
     private String validNonce;
 
-    public BlockchainHeader(String difficulty) {
-        Random rand = new Random();
-        int random1 = rand.nextInt();
-        int random2 = rand.nextInt();
+    public BlockchainHeader(String difficulty, Random random) {
+        int random1 = random.nextInt();
+        int random2 = random.nextInt();
         this.hashOfPreviousBlock = Integer.toHexString(random1);
         this.merkleRoot = Integer.toHexString(random2);
         this.difficulty = difficulty;
