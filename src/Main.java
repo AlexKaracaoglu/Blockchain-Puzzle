@@ -9,9 +9,9 @@
  * RESOURCES USED:
  *
  * https://www.baeldung.com/java-byte-arrays-hex-strings (Message Digest Usage for SHA-256)
- * https://www.baeldung.com/sha-256-hashing-java (bytesToHex Function **NO LONGER USED**)
  * https://stackoverflow.com/questions/732034/getting-unixtime-in-java (Getting unix time)
  * https://stackoverflow.com/questions/4400774/java-calculate-hex-representation-of-a-sha-1-digest-of-a-string  (Message Digest General Usage)
+ * https://stackoverflow.com/questions/5317320/regex-to-check-string-contains-only-hex-characters (Checking Hex Format of Difficulty)
  *
  */
 
@@ -38,11 +38,12 @@ public class Main {
     private static final String UTF8 = "utf8";
     private static final String SHA_256 = "SHA-256";
     private static final Integer SIXTY_FOUR = 64;
+    private static final String HEX_FORMAT = "[0-9a-f]+";
 
     public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
         String difficulty = "0000004011111111111111111111111111111111111111111111111111111111";
-        checkValidDifficultyLength(difficulty);
+        checkValidDifficultyFormat(difficulty);
 
         long startTime = System.currentTimeMillis();
         long endTime = System.currentTimeMillis();
@@ -73,9 +74,12 @@ public class Main {
         System.out.println("Time to find a valid hash: " + getTimeElapsedInSeconds(startTime, endTime) + " seconds");
     }
 
-    private static void checkValidDifficultyLength(String difficulty) {
+    private static void checkValidDifficultyFormat(String difficulty) {
         if (difficulty.length() != SIXTY_FOUR) {
             throw new IllegalArgumentException("Difficulty hex string must be of length 64");
+        }
+        if (!difficulty.matches(HEX_FORMAT)) {
+            throw new IllegalArgumentException("Difficulty string must include only hex digits");
         }
     }
 
