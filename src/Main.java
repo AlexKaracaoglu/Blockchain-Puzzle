@@ -12,26 +12,25 @@
  * https://stackoverflow.com/questions/732034/getting-unixtime-in-java (Getting unix time)
  * https://stackoverflow.com/questions/4400774/java-calculate-hex-representation-of-a-sha-1-digest-of-a-string  (Message Digest General Usage)
  * https://stackoverflow.com/questions/5317320/regex-to-check-string-contains-only-hex-characters (Checking Hex Format of Difficulty)
+ * https://en.bitcoin.it/wiki/Block_hashing_algorithm (Resource on General Idea)
  *
  */
 
 /*
  * Some things to note:
- *      1. difficulty = 64 length hex representation
+ *      1. difficulty = 64 length hex representation = 256 bits
+ *      2. nonce = Long (we start at 0 and increment)
+ *          When format hash of block header, we change to 32 bit hex string with %08x
+ *      3. unixTime = Long
+ *          When format hash of block header, we change to 32 bit hex string with %08x
  */
 
-/*
- * Some things to consider:
- *      1. Placing in difficulty in an easy way, how can we streamline that?
- *      2. Do we want uppercase or lowercase for hashes (matters for comparison)
- *      3. How can we make the while loop better?
- */
+//TODO: difficulty - We should see if there's a better way to work with this
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 
 public class Main {
 
@@ -39,39 +38,53 @@ public class Main {
     private static final String SHA_256 = "SHA-256";
     private static final Integer SIXTY_FOUR = 64;
     private static final String HEX_FORMAT = "[0-9a-f]+";
+    private static final String EIGHT_HEX_DIGITS = "%08x";
 
     public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-
-        String difficulty = "0000004011111111111111111111111111111111111111111111111111111111";
+        String difficulty = "f000004011111111111111111111111111111111111111111111111111111111";
         checkValidDifficultyFormat(difficulty);
 
-        long startTime = System.currentTimeMillis();
-        long endTime = System.currentTimeMillis();
+        Long startTime = System.currentTimeMillis();
+        Long endTime = -1L;
 
-        int numberOfNoncesChecked = 0;
+        Long nonce = 0L;
 
         MessageDigest messageDigest = MessageDigest.getInstance(SHA_256);
-        Random random = new Random();
-        BlockchainHeader header = new BlockchainHeader(difficulty, random);
+        BlockchainHeader header = new BlockchainHeader(difficulty);
 
         while (Boolean.TRUE) {
-            numberOfNoncesChecked++;
-
-            String nonce = getNonce(random);
-            String hashValue = getHashValue(header.getHashOfPreviousBlock(), nonce, messageDigest);
+            String hashValue = updateHeaderAndHashContents(nonce, header, messageDigest);
 
             if (hashValue.compareTo(header.getDifficulty()) < 0) {
                 endTime = System.currentTimeMillis();
-                header.setValidNonce(nonce);
-                header.setUnixTime(System.currentTimeMillis() / 1000L);
 
-                System.out.println("Valid nonce is: " + nonce + ", Number of nonces checked: " + numberOfNoncesChecked);
+                System.out.println("Valid nonce is: " + nonce + ", Number of nonces checked: " + (nonce + 1));
                 System.out.println("Hash Value is: " + hashValue);
 
                 break;
             }
+            nonce++;
         }
         System.out.println("Time to find a valid hash: " + getTimeElapsedInSeconds(startTime, endTime) + " seconds");
+    }
+
+    private static String updateHeaderAndHashContents(long nonce, BlockchainHeader header, MessageDigest messageDigest) throws UnsupportedEncodingException {
+        header.setNonce(nonce);
+        header.setUnixTime();
+
+        String headerString = getHeaderString(header);
+
+        messageDigest.update(headerString.getBytes(UTF8));
+        byte[] digestBytes = messageDigest.digest();
+        return DatatypeConverter.printHexBinary(digestBytes).toLowerCase();
+    }
+
+    private static String getHeaderString(BlockchainHeader header) {
+        return header.getHashOfPreviousBlockHeader() +
+                header.getMerkleRoot() +
+                String.format(EIGHT_HEX_DIGITS, header.getUnixTime()) +
+                header.getDifficulty() +
+                String.format(EIGHT_HEX_DIGITS, header.getNonce());
     }
 
     private static void checkValidDifficultyFormat(String difficulty) {
@@ -85,15 +98,5 @@ public class Main {
 
     private static Double getTimeElapsedInSeconds(long startTime, long endTime) {
         return (endTime - startTime) / 1000.;
-    }
-
-    private static String getNonce(Random rand) {
-        return Integer.toHexString(rand.nextInt());
-    }
-
-    private static String getHashValue(String hashOfPreviousBlock, String nonce, MessageDigest messageDigest) throws UnsupportedEncodingException {
-        messageDigest.update((hashOfPreviousBlock + nonce).getBytes(UTF8));
-        byte[] digestBytes = messageDigest.digest();
-        return DatatypeConverter.printHexBinary(digestBytes).toLowerCase();
     }
 }

@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class BlockchainHeader {
 
-    private String hashOfPreviousBlock;
+    private String hashOfPreviousBlockHeader;
 
     private String merkleRoot;
 
@@ -16,22 +16,26 @@ public class BlockchainHeader {
 
     private String difficulty;
 
-    private String validNonce;
+    private Long nonce;
 
-    public BlockchainHeader(String difficulty, Random random) {
+    public BlockchainHeader(String difficulty) {
+        Random random = new Random();
+
         int random1 = random.nextInt();
         int random2 = random.nextInt();
-        this.hashOfPreviousBlock = Integer.toHexString(random1);
-        this.merkleRoot = Integer.toHexString(random2);
+
+        this.hashOfPreviousBlockHeader = String.format("%08x", random1);
+        this.merkleRoot = String.format("%08x", random2);
+        this.unixTime = System.currentTimeMillis() / 1000L;
         this.difficulty = difficulty;
     }
 
-    public String getHashOfPreviousBlock() {
-        return hashOfPreviousBlock;
+    public String getHashOfPreviousBlockHeader() {
+        return hashOfPreviousBlockHeader;
     }
 
-    public void setHashOfPreviousBlock(String hashOfPreviousBlock) {
-        this.hashOfPreviousBlock = hashOfPreviousBlock;
+    public void setHashOfPreviousBlockHeader(String hashOfPreviousBlockHeader) {
+        this.hashOfPreviousBlockHeader = hashOfPreviousBlockHeader;
     }
 
     public String getMerkleRoot() {
@@ -50,6 +54,10 @@ public class BlockchainHeader {
         this.unixTime = unixTime;
     }
 
+    public void setUnixTime() {
+        this.unixTime = System.currentTimeMillis() / 1000L;
+    }
+
     public String getDifficulty() {
         return difficulty;
     }
@@ -58,11 +66,11 @@ public class BlockchainHeader {
         this.difficulty = difficulty;
     }
 
-    public String getValidNonce() {
-        return validNonce;
+    public Long getNonce() {
+        return nonce;
     }
 
-    public void setValidNonce(String validNonce) {
-        this.validNonce = validNonce;
+    public void setNonce(Long nonce) {
+        this.nonce = nonce;
     }
 }
