@@ -25,7 +25,9 @@
  *          When format hash of block header, we change to 32 bit hex string with %08x
  */
 
-//TODO: difficulty - We should see if there's a better way to work with this
+// TODO: difficulty - We should see if there's a better way to work with this
+
+// TODO: unixTime - Do we need to update every iteration or just set it at beginning and let run until nonce found?
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
