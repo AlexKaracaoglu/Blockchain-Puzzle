@@ -4,14 +4,13 @@
  * Group 9
  */
 
-
 /*
  * RESOURCES USED:
  *
  * https://www.baeldung.com/java-byte-arrays-hex-strings (Message Digest Usage for SHA-256)
  * https://stackoverflow.com/questions/732034/getting-unixtime-in-java (Getting unix time)
  * https://stackoverflow.com/questions/4400774/java-calculate-hex-representation-of-a-sha-1-digest-of-a-string  (Message Digest General Usage)
- * https://stackoverflow.com/questions/5317320/regex-to-check-string-contains-only-hex-characters (Checking Hex Format of Difficulty)
+ * https://stackoverflow.com/questions/5317320/regex-to-check-string-contains-only-hex-characters (Checking Hex Format of Settings)
  * https://en.bitcoin.it/wiki/Block_hashing_algorithm (Resource on General Idea)
  *
  */
@@ -25,9 +24,8 @@
  *          When format hash of block header, we change to 32 bit hex string with %08x
  */
 
-// TODO: difficulty - We should see if there's a better way to work with this
-
-// TODO: unixTime - Do we need to update every iteration or just set it at beginning and let run until nonce found?
+// TODO: Run code and make graphs
+// TODO: (Bonus): Run on different machines with different computation power and see and graph changes in results
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
@@ -43,36 +41,34 @@ public class Main {
     private static final String EIGHT_HEX_DIGITS = "%08x";
 
     public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        String difficulty = "f000004011111111111111111111111111111111111111111111111111111111";
+        Settings settings = new Settings();
+        String difficulty = settings.getDifficulty();
+
         checkValidDifficultyFormat(difficulty);
 
         Long startTime = System.currentTimeMillis();
-        Long endTime = -1L;
 
         Long nonce = 0L;
 
         MessageDigest messageDigest = MessageDigest.getInstance(SHA_256);
         BlockchainHeader header = new BlockchainHeader(difficulty);
 
-        while (Boolean.TRUE) {
-            String hashValue = updateHeaderAndHashContents(nonce, header, messageDigest);
+        String hashValue = updateHeaderAndHashContents(nonce, header, messageDigest);
 
-            if (hashValue.compareTo(header.getDifficulty()) < 0) {
-                endTime = System.currentTimeMillis();
-
-                System.out.println("Valid nonce is: " + nonce + ", Number of nonces checked: " + (nonce + 1));
-                System.out.println("Hash Value is: " + hashValue);
-
-                break;
-            }
+        while (hashValue.compareTo(header.getDifficulty()) >= 0) {
             nonce++;
+            hashValue = updateHeaderAndHashContents(nonce, header, messageDigest);
         }
+
+        Long endTime = System.currentTimeMillis();
+
+        System.out.println("Valid nonce is: " + nonce + ", Number of nonces checked: " + (nonce + 1));
+        System.out.println("Hash Value is: " + hashValue);
         System.out.println("Time to find a valid hash: " + getTimeElapsedInSeconds(startTime, endTime) + " seconds");
     }
 
-    private static String updateHeaderAndHashContents(long nonce, BlockchainHeader header, MessageDigest messageDigest) throws UnsupportedEncodingException {
+    private static String updateHeaderAndHashContents(Long nonce, BlockchainHeader header, MessageDigest messageDigest) throws UnsupportedEncodingException {
         header.setNonce(nonce);
-        header.setUnixTime();
 
         String headerString = getHeaderString(header);
 
@@ -91,10 +87,10 @@ public class Main {
 
     private static void checkValidDifficultyFormat(String difficulty) {
         if (difficulty.length() != SIXTY_FOUR) {
-            throw new IllegalArgumentException("Difficulty hex string must be of length 64");
+            throw new IllegalArgumentException("Settings hex string must be of length 64");
         }
         if (!difficulty.matches(HEX_FORMAT)) {
-            throw new IllegalArgumentException("Difficulty string must include only hex digits");
+            throw new IllegalArgumentException("Settings string must include only hex digits");
         }
     }
 
