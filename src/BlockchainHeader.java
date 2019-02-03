@@ -21,11 +21,11 @@ public class BlockchainHeader {
     public BlockchainHeader(String difficulty) {
         Random random = new Random();
 
-        int random1 = random.nextInt();
-        int random2 = random.nextInt();
+        Long random1 = random.nextLong();
+        Long random2 = random.nextLong();
 
-        this.hashOfPreviousBlockHeader = String.format("%08x", random1);
-        this.merkleRoot = String.format("%08x", random2);
+        this.hashOfPreviousBlockHeader = Long.toHexString(random1);
+        this.merkleRoot = Long.toHexString(random2);
         this.unixTime = System.currentTimeMillis() / 1000L;
         this.difficulty = difficulty;
     }

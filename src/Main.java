@@ -27,6 +27,8 @@
 // TODO: Run code and make graphs
 // TODO: (Bonus): Run on different machines with different computation power and see and graph changes in results
 
+// TODO: Should we update unixTime every time we hash?
+
 import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
