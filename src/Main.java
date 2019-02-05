@@ -96,7 +96,7 @@ public class Main {
         }
     }
 
-    private static Double getTimeElapsedInSeconds(long startTime, long endTime) {
+    private static Double getTimeElapsedInSeconds(Long startTime, Long endTime) {
         return (endTime - startTime) / 1000.;
     }
 }
