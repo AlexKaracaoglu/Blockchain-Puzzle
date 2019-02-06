@@ -12,6 +12,7 @@
  * https://stackoverflow.com/questions/4400774/java-calculate-hex-representation-of-a-sha-1-digest-of-a-string  (Message Digest General Usage)
  * https://stackoverflow.com/questions/5317320/regex-to-check-string-contains-only-hex-characters (Checking Hex Format of Settings)
  * https://en.bitcoin.it/wiki/Block_hashing_algorithm (Resource on General Idea)
+ * https://stackoverflow.com/questions/2817752/java-code-to-convert-byte-to-hexadecimal (StringBuilder bytes to hex)
  *
  */
 
@@ -25,11 +26,9 @@
  */
 
 // TODO: Run code and make graphs
+
 // TODO: (Bonus): Run on different machines with different computation power and see and graph changes in results
 
-// TODO: Should we update unixTime every time we hash?
-
-import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -41,6 +40,7 @@ public class Main {
     private static final Integer SIXTY_FOUR = 64;
     private static final String HEX_FORMAT = "[0-9a-f]+";
     private static final String EIGHT_HEX_DIGITS = "%08x";
+    private static final String TWO_HEX_DIGITS = "%02x";
 
     public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         Settings settings = new Settings();
@@ -71,12 +71,19 @@ public class Main {
 
     private static String updateHeaderAndHashContents(Long nonce, BlockchainHeader header, MessageDigest messageDigest) throws UnsupportedEncodingException {
         header.setNonce(nonce);
-
         String headerString = getHeaderString(header);
 
         messageDigest.update(headerString.getBytes(UTF8));
         byte[] digestBytes = messageDigest.digest();
-        return DatatypeConverter.printHexBinary(digestBytes).toLowerCase();
+        return buildHexStringFromDigestBytes(digestBytes);
+    }
+
+    private static String buildHexStringFromDigestBytes(byte[] digestBytes) {
+        StringBuilder hexFormat = new StringBuilder();
+        for (byte b: digestBytes) {
+            hexFormat.append(String.format(TWO_HEX_DIGITS, b));
+        }
+        return hexFormat.toString();
     }
 
     private static String getHeaderString(BlockchainHeader header) {

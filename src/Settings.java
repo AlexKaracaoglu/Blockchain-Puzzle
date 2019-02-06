@@ -6,7 +6,7 @@
 
 public class Settings {
 
-    private String difficulty = "000000ff11111111111111111111111111111111111111111111111111111111";
+    private String difficulty = "010000ff11111111111111111111111111111111111111111111111111111111";
 
     public String getDifficulty() {
         return difficulty;
