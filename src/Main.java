@@ -25,10 +25,6 @@
  *          When format hash of block header, we change to 32 bit hex string with %08x
  */
 
-// TODO: Run code and make graphs
-
-// TODO: (Bonus): Run on different machines with different computation power and see and graph changes in results
-
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
